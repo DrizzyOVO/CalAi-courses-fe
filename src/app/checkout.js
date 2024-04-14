@@ -21,8 +21,8 @@ export async function checkout({lineItems}){
 	await stripe.redirectToCheckout({
 		mode: 'payment',
 		lineItems,
-		successUrl: `${window.location.origin}?session_id={CHECKOUT_SESSION_ID}`,
-		cancelUrl: window.location.origin
+		successUrl: `${window.location.origin}/courses/1/purchased?session_id={CHECKOUT_SESSION_ID}`,
+		cancelUrl: `${window.location.origin}/courses/1/failed`
 	}).then(result => {
         if (result.error) {
             alert(result.error.message);

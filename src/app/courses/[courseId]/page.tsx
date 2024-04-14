@@ -33,6 +33,7 @@ function Course({ params } : {params : any}) {
     const [course, setCourse] = useState<Course>(); 
     const courseLoading = useRecoilValue(isCourseLoading);
     const userEmail = useRecoilValue(userEmailState)
+    const [isLoading, setIsLoading] = useState(true); 
 
     useEffect(() => {
       async function smth() {
@@ -45,6 +46,7 @@ function Course({ params } : {params : any}) {
             setUserid(response?.data.userId); 
             setCourse(response?.data.course); 
             setUser(response?.data.theUser); 
+            setIsLoading(false); 
             console.log("course :- " + response?.data.course); 
             console.log(course);
             console.log("title :- " + course?.title); 
@@ -55,28 +57,6 @@ function Course({ params } : {params : any}) {
   
     }, []);
 
-    const out = async () => {
-
-      let key = ""
-      if (course?.title == "Ui/Ux") { 
-        key = `${process.env.NEXT_PUBLIC_UI_UX}`
-      } else if (course?.title == "LaFerrari") { 
-        key = `${process.env.NEXT_PUBLIC_LAFERRARI}`
-      } else { 
-        key = `${process.env.NEXT_PUBLIC_WEBSITE_DEVELOPMENT}`
-      }
-
-      checkout({
-        lineItems: [
-          {
-            price: key,
-            quantity: 1
-          }
-        ]
-      }) 
-
-    }
-
     const buyCourse = async () => {
 
       const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/user/courses/${courseId}/buy`, {
@@ -86,34 +66,18 @@ function Course({ params } : {params : any}) {
             "Content-type": "application/json"
         }
     }); 
-
-      // let key = ""
-      // if (course?.title == "Ui/Ux") { 
-      //   key = `${process.env.NEXT_PUBLIC_UI_UX}`
-      // } else if (course?.title == "LaFerrari") { 
-      //   key = `${process.env.NEXT_PUBLIC_LAFERRARI}`
-      // } else { 
-      //   key = `${process.env.NEXT_PUBLIC_WEBSITE_DEVELOPMENT}`
-      // }
-      // // buyCourse();
-      // checkout({
-      //   lineItems: [
-      //     {
-      //       price: key,
-      //       quantity: 1
-      //     }
-      //   ]
-      // }) 
   
       if(response?.data.message == "Bought it") {  
         setBought(true); 
         router.push(`/courses/${courseId}/purchased`); 
       }
+  
+    }
 
-      // await out(); 
-  
-      // router.push(`http://localhost:3000/courses/${courseId}/${userid}`); 
-  
+    if(isLoading) { 
+      <div>
+        Loading...
+      </div>
     }
 
     return (
@@ -160,29 +124,18 @@ function Course({ params } : {params : any}) {
                         }
                       ]
                     }) 
+
                     buyCourse();
-
-                    // const {paymentIntent, error} = await stripe.confirmCardPayment(clientSecret);
-                    // if (error) {
-                    //     console.log("error byuing");
-                    // } else if (paymentIntent && paymentIntent.status === 'succeeded') {
-                    //     await buyCourse(); 
-                    // }
-
-                  // })}
-
-                  // onClick={async () => {
-                  //   const response = router.push(`https://buy.stripe.com/test_9AQg03byM0r8d2w144`)
-                  //   console.log(response); 
+ 
                   }}
 
                 >Buy</button> 
               // </form>
             } 
           </div>
-          {/* <div style={{ display: "flex", justifyContent: "center" }}>
-            <h1>{userid ? "yesss" : "Nooooo"}</h1>
-          </div> */}
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            <h1>use <span className="text-indigo-600 font-bold">4242 4242 4242 4242</span> in card section while buying for testing purpose!</h1>
+          </div>
         </div>
     </div>
     </>
@@ -244,6 +197,3 @@ function Price({ price }: { price: Number }) {
 
 export default Course;
 
-
-
-// onClick={() => buyCourse(String(course?.id))}

@@ -20,67 +20,6 @@ function AddCourse() {
     const router = useRouter(); 
     const adminEmail = useRecoilValue(adminEmailState); 
 
-    // return <div style={{display: "flex", justifyContent: "center", minHeight: "80vh", flexDirection: "column"}}>
-    //     <div style={{display: "flex", justifyContent: "center"}}>
-    //         <Card style={{width: 400, padding: 20, marginTop: 30, height: "100%", borderRadius: "30px"}}>
-    //             <TextField
-    //                 style={{marginBottom: 10}}
-    //                 onChange={(e) => {
-    //                     setTitle(e.target.value)
-    //                 }}
-    //                 fullWidth={true}
-    //                 label="Title"
-    //                 variant="outlined"
-    //             />
-
-    //             <TextField
-    //                 style={{marginBottom: 10}}
-    //                 onChange={(e) => {
-    //                     setDescription(e.target.value)
-    //                 }}
-    //                 fullWidth={true}
-    //                 label="Description"
-    //                 variant="outlined"
-    //             />
-
-    //             <TextField
-    //                 style={{marginBottom: 10}}
-    //                 onChange={(e) => {
-    //                     {Number.isNaN(price) ? setPrice(0) : setPrice(parseInt((e.target.value)))}
-    //                 }}
-    //                 fullWidth={true}
-    //                 label="Price"
-    //                 variant="outlined"
-    //             />
-
-    //             <Button
-    //                 size={"large"}
-    //                 // variant="contained"
-    //                 onClick={async () => {
-    //                     const response = await axios.post(`http://localhost:5000/admin/createCourse`, {
-    //                         title: title,
-    //                         description: description,
-    //                         published: true,
-    //                         price: price 
-    //                     }, {
-    //                         headers: {
-    //                             "Content-type": "application/json",
-    //                             "Authorization": "Bearer " + localStorage.getItem("token")
-    //                         }
-    //                     });
-
-    //                     if(response){ 
-    //                         // window.alert("Added course!");
-    //                         router.push("/addcourse/courseadded")
-    //                     }
-
-    //                 }}
-    //             > Add course</Button>
-    //         </Card>
-    //     </div>
-    // </div>
-
-
     return <div className='flex justify-center'>
 
     <div className="relative flex flex-col text-gray-700 bg-white shadow-md w-96 rounded-xl bg-clip-border mt-20">
@@ -159,8 +98,7 @@ function AddCourse() {
                 email: adminEmail
             }, {
                 headers: {
-                    "Content-type": "application/json",
-                    "Authorization": "Bearer " + localStorage.getItem("token")
+                    "Content-type": "application/json"
                 }
             }) : null; 
 
@@ -169,11 +107,9 @@ function AddCourse() {
                 if(response.data.message == 'Course added successfully') { 
                     router.push("/adminui/addcourse/courseadded")
                 } else { 
-                    // window.alert("Couldn't add course :( /n pls try again later!"); 
                     toast.error("Couldn't add course :( /n pls try again later!")
                 }
             } else { 
-                // window.alert("An unexpected error occured :( /n pls try again later!");
                 toast.error("An unexpected error occured :( /n pls try again later!")
             }
 

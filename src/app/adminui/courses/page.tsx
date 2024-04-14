@@ -23,31 +23,6 @@ function PurchasedCourses() {
 
     type typeofthis = courseInterfaceUi; 
 
-    // const init = async () => {
-    //     const response = await axios.get(`http://localhost:3000/admin/courses`, {
-    //         headers: {
-    //             Authorization: `Bearer ${localStorage.getItem('token')}`
-    //         }
-    //     })
-    //     setCourses(response.data.courses)
-    //     setEmail(response.data.email);
-    //     setTheCourse({course: null, isLoading: true});
-    //     console.log(response.data.courses);
-    //     if(response.data.email){
-    //         setUser({ 
-    //             userEmail: response.data.email, 
-    //             userId: response.data.userId, 
-    //             isLoading: false 
-    //         });  
-    //     } else{ 
-    //         setUser({ 
-    //             isLoading: false, 
-    //             userEmail: null, 
-    //             userId: null 
-    //         })
-    //     }
-    // }
-
     useEffect(() => {
 
         const init = async () => {
@@ -137,20 +112,5 @@ function Course({course}: any) {
 
 }
 
-{/* <Card style={{
-        margin: 10,
-        width: 300,
-        minHeight: 200,
-        padding: 20
-    }}>
-        <Typography textAlign={"center"} variant="h5">{course.title}</Typography>
-        <Typography textAlign={"center"} variant="subtitle1">{course.description}</Typography>
-        <div style={{display: "flex", justifyContent: "center", marginTop: 20}}>
-            <Button variant="contained" size="large" onClick={() => {
-                router.push("http://localhost:3000/courses/" + course.id);
-            }}>Buy</Button>
-        </div>
-    </Card> */}
-    {/* <img src={course.imageLink} style={{width: 300}} ></img> */}
 
 export default PurchasedCourses;

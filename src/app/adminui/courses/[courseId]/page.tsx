@@ -22,25 +22,6 @@ function Course({ params } : {params : any}) {
     const router = useRouter(); 
     const adminEmail = useRecoilValue(adminEmailState); 
 
-    // useEffect(() => {
-
-    //     console.log(courseId);
-    //     async function smth(){
-    //     await axios.get(`http://localhost:5000/admin/courses/${courseId}`, {
-    //         headers: {
-    //             "Authorization": "Bearer " + localStorage.getItem("token")
-    //         }
-    //     }).then(res => {
-    //         setCourse({isLoading: false, course: res.data.course});
-    //     })
-    //     .catch(e => {
-    //         setCourse({isLoading: false, course: null});
-    //     });
-    //   }
-    //   smth(); 
-    // }, []);
-
-
     useEffect(() => {
         
         setTimeout(() => {
@@ -233,29 +214,4 @@ function Price() {
 }
 
 export default Course;
-
-
-
-
-
-
-  // useEffect(() => {
-  //   async function smth() {
-
-  //       const response = await axios.get(`http://localhost:5000/admin/courses/${courseId}`, { 
-  //           headers: {
-  //               "Authorization": "Bearer " + localStorage.getItem("token")
-  //           }
-  //       }); 
-
-  //       if(response.data.message == "course found") { 
-  //         setUserid(response.data.adminId); 
-  //         setCourse(response.data.course); 
-  //         setUser(response.data.theUser); 
-  //       }
-
-  //   }
-  //   smth(); 
-
-  // }, []);
 

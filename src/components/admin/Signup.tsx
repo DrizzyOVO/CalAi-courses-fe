@@ -7,8 +7,14 @@ import axios from "axios";
 import { useRouter } from 'next/navigation'
 import { useSetRecoilState } from 'recoil';
 import { adminState } from '@/store/atoms/admin';
-import { toast } from 'react-toast';
 import { UserAuth } from '@/app/AuthContext';
+import toast from 'react-hot-toast';
+import { z } from 'zod';
+
+const signUpInput = z.object({ 
+    email: z.string().max(50).min(5).email(), 
+    password: z.string().min(6)
+}); 
 
 function Signup() {
     const router = useRouter(); 
@@ -70,71 +76,78 @@ function Signup() {
                                         setCode(e.target.value);
                                     }}
                                     className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
-                                    type="" placeholder="Secret code" />
+                                    type="" placeholder="use 'admin' as a Secret code" />
 
                                 <button
 
-                                    onClick={async() => {
+                                    onClick={async() => { 
 
-                                        toast.success("Please hold on, while we connect to our backend"); 
+                                        const parsedInput = signUpInput.safeParse({email, password}); 
+                                    
+                                        if(!parsedInput.success) {
+                                            toast.error('invalid email / password \n password length more the 6 characters! \n use admin as a secret key', {duration: 4000})
+                                        } else {
 
-                                        const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/admin/signup`, {
-                                            email: email,
-                                            password: password, 
-                                            secretCode: code
-                                        })
-                                        
-                                        if (response) { 
+                                            toast.loading("Please hold on, while we connect to our backend", {duration: 7000});
 
-                                            if(response.data.message == "Admin logged in"){  
-                                                await handleSignInOnSignUp(email, password);
-                                                setAdmin({ 
-                                                    isLoading: false, 
-                                                    adminEmail: response.data.email, 
-                                                })
-                                                router.push("/adminui");
-                                            } else if (response.data.message == "Admin created") {
+                                            const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/admin/signup`, {
+                                                email: email,
+                                                password: password, 
+                                                secretCode: code
+                                            })
+                                            
+                                            if (response) { 
 
-                                                await handleSignUp(email, password); 
-                                                await handleSignInOnSignUp(email, password);
+                                                if(response.data.message == "Admin logged in"){  
+                                                    await handleSignInOnSignUp(email, password);
+                                                    setAdmin({ 
+                                                        isLoading: false, 
+                                                        adminEmail: response.data.email, 
+                                                    })
+                                                    router.push("/adminui");
+                                                } else if (response.data.message == "Admin created") {
 
-                                                setAdmin({ 
-                                                    isLoading: false, 
-                                                    adminEmail: response.data.email, 
-                                                })
+                                                    await handleSignUp(email, password); 
+                                                    await handleSignInOnSignUp(email, password);
 
-                                            } else if (response.data.message == "Incorrect password") {
+                                                    setAdmin({ 
+                                                        isLoading: false, 
+                                                        adminEmail: response.data.email, 
+                                                    })
 
-                                                toast.error("Incorrect password")
-                                                setAdmin({ 
-                                                    isLoading: false, 
-                                                    adminEmail: null, 
-                                                }); 
+                                                } else if (response.data.message == "Incorrect password") {
 
-                                            } else if (response.data.message == "wrong code") { 
+                                                    toast.error("Incorrect password")
+                                                    setAdmin({ 
+                                                        isLoading: false, 
+                                                        adminEmail: null, 
+                                                    }); 
 
-                                                toast.error("Wrong secret code")
-                                                setAdmin({ 
-                                                    isLoading: false, 
-                                                    adminEmail: null, 
-                                                }); 
+                                                } else if (response.data.message == "wrong code") { 
+
+                                                    toast.error("Wrong secret code")
+                                                    setAdmin({ 
+                                                        isLoading: false, 
+                                                        adminEmail: null, 
+                                                    }); 
+
+                                                } else { 
+                                                    toast.error("Server may be down, pls try again.")
+                                                    setAdmin({ 
+                                                        isLoading: false, 
+                                                        adminEmail: null, 
+                                                    }); 
+                                                }
 
                                             } else { 
-                                                toast.error("Server may be down, pls try again.")
                                                 setAdmin({ 
                                                     isLoading: false, 
                                                     adminEmail: null, 
-                                                }); 
+                                                })
+                                                console.log("No data bro");
                                             }
-
-                                        } else { 
-                                            setAdmin({ 
-                                                isLoading: false, 
-                                                adminEmail: null, 
-                                            })
-                                            console.log("No data bro");
-                                        }
-                                    }}
+                                        }}
+                                    }
 
                                     className="mt-5 tracking-wide font-semibold bg-indigo-500 text-gray-100 w-full py-4 rounded-lg hover:bg-indigo-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none">
                                     <svg className="w-6 h-6 -ml-2" fill="none" stroke="currentColor" stroke-width="2"
@@ -175,49 +188,3 @@ function Signup() {
 }
 
 export default Signup;
-
-// onClick={async() => {
-//     const response = await axios.post("http://localhost:5000/admin/signup", {
-//         email: email,
-//         password: password, 
-//         secretCode: code
-//     })
-    
-//     if (response.data) { 
-
-//         if(response.data.message == "Admin logged in"){  
-//             console.log("Admin loggddddddddddd");
-//             localStorage.setItem("token", response.data.token);
-//             setAdmin({ 
-//                 isLoading: false, 
-//                 adminEmail: response.data.email,  
-//                 adminId: response.data.userId   
-//             })
-//             router.push("http://localhost:4000");
-//         } else if (response.data.message == "wrong code") { 
-
-//             window.alert("Wrong secret code");  
-//             setAdmin({ 
-//                 isLoading: false, 
-//                 adminEmail: null,   
-//                 adminId: null  
-//             }); 
-
-//         } else { 
-//             window.alert("Server may be down, pls try again."); 
-//             setAdmin({ 
-//                 isLoading: false, 
-//                 adminEmail: null,   
-//                 adminId: null  
-//             }); 
-//         }
-
-//     } else { 
-//         setAdmin({ 
-//             isLoading: false, 
-//             adminEmail: null,   
-//             adminId: null  
-//         })
-//         console.log("No data bro");
-//     }
-// }}

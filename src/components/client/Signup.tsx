@@ -7,8 +7,14 @@ import axios from "axios";
 import { useRouter } from 'next/navigation'
 import { useSetRecoilState } from 'recoil';
 import { userState } from '@/store/atoms/user';
-import { toast } from 'react-toast';
 import { UserAuth } from '@/app/AuthContext';
+import toast from 'react-hot-toast';
+import { z } from 'zod';
+
+const signUpInput = z.object({ 
+    email: z.string().max(50).min(5).email(), 
+    password: z.string().min(6)
+}); 
 
 function Signup() {
     const router = useRouter(); 
@@ -67,54 +73,57 @@ return (
                                     type="password" placeholder="Password" />
                                 <button
 
-                                    onClick={async() => {
+                                    onClick={async() => { 
 
-                                        toast.success("Please hold on, while we connect to our backend"); 
+                                        const parsedInput = signUpInput.safeParse({email, password}); 
+                                    
+                                        if(!parsedInput.success) {
+                                            toast.error('invalid email / password \n password length more the 6 characters!', {duration: 4000})
+                                        } else {
 
-                                        const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/user/signup`, {
-                                            email: email,
-                                            password: password
-                                        })
-                                        
-                                        if (response) { 
-                
-                                            if(response.data.error){
-                                                toast.error('Invalid input :( \nemail length should be between 5-30 \npassword length should be between 7-30') 
-                                            }
-                
-                                            else if (response.data.message == 'User already exists'){  
-                                                let data = response.data;
-                                                await handleSignInOnSignUp(email, password);  
-                                                setUser({ 
-                                                    isLoading: false, 
-                                                    userEmail: data.email
-                                                }); 
-                                                router.push("/");
-                                            } else if (response.data.message == 'Created user sucessfully') {
+                                            toast.loading("Please hold on, while we connect to our backend", {duration: 7000});
 
-                                                await handleSignUp(email, password); 
-                                                await handleSignInOnSignUp(email, password); 
+                                            const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/user/signup`, {
+                                                email: email,
+                                                password: password
+                                            })
+                                            
+                                            if (response) { 
+                    
+                                                if (response.data.message == 'User already exists'){  
+                                                    let data = response.data;
+                                                    await handleSignInOnSignUp(email, password);  
+                                                    setUser({ 
+                                                        isLoading: false, 
+                                                        userEmail: data.email
+                                                    }); 
+                                                    router.push("/");
+                                                } else if (response.data.message == 'Created user sucessfully') {
 
-                                            } else if (response.data.message == "Incorrect password"){
-                                                toast.error('Incorrect Password')
-                                                setUser({ 
-                                                    isLoading: false, 
-                                                    userEmail: null
-                                                }); 
-                                            } else {
-                                                toast.error("Try again.")
-                                                setUser({ 
-                                                    isLoading: false, 
-                                                    userEmail: null
-                                                }); 
+                                                    await handleSignUp(email, password); 
+                                                    await handleSignInOnSignUp(email, password); 
+
+                                                } else if (response.data.message == "Incorrect password"){
+                                                    toast.error('Incorrect Password')
+                                                    setUser({ 
+                                                        isLoading: false, 
+                                                        userEmail: null
+                                                    }); 
+                                                } else {
+                                                    toast.error("Try again.")
+                                                    setUser({ 
+                                                        isLoading: false, 
+                                                        userEmail: null
+                                                    }); 
+                                                    router.push("/singup");
+                                                } 
+                    
+                                            } else { 
+                                                toast.error('Try again!')
                                                 router.push("/singup");
-                                            } 
-                
-                                        } else { 
-                                            toast.error('Try again!')
-                                            router.push("/singup");
-                                        }
-                                    }}
+                                            }
+                                        }}
+                                    }
 
                                     className="mt-5 tracking-wide font-semibold bg-indigo-500 text-gray-100 w-full py-4 rounded-lg hover:bg-indigo-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none">
                                     <svg className="w-6 h-6 -ml-2" fill="none" stroke="currentColor" stroke-width="2"

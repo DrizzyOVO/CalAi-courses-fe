@@ -1,87 +1,6 @@
 "use client" 
 
 import { adminState } from '@/store/atoms/admin';
-
-// function Signin() {
-//     const router = useRouter(); 
-//     const [email, setEmail] = useState("")
-//     const [password, setPassword] = useState("")
-//     const setAdmin = useSetRecoilState(adminState); 
-
-//     return <div>
-//             <div style={{
-//                 paddingTop: 150,
-//                 marginBottom: 10,
-//                 display: "flex",
-//                 justifyContent: "center"
-//             }}>
-//                 <Typography variant={"h6"}>
-//                 Welcome to Coursera. Sign in below
-//                 </Typography>
-//             </div>
-//         <div style={{display: "flex", justifyContent: "center"}}>
-//             <Card style={{width: 400, padding: 20}}>
-//                 <TextField
-//                     onChange={(evant11) => {
-//                         let elemt = evant11.target;
-//                         setEmail(elemt.value);
-//                     }}
-//                     fullWidth={true}
-//                     label="Email"
-//                     variant="outlined"
-//                 />
-//                 <br/><br/>
-//                 <TextField
-//                     onChange={(e) => {
-//                         setPassword(e.target.value);
-//                     }}
-//                     fullWidth={true}
-//                     label="Password"
-//                     variant="outlined"
-//                     type={"password"}
-//                 />
-//                 <br/><br/>
-
-//                 <Button
-//                     size={"large"}
-//                     variant="contained"
-//                     onClick={async () => {
-//                         const res = await axios.post("http://localhost:5000/admin/login", {
-//                             email: email,
-//                             password: password
-//                         }, {
-//                             headers: {
-//                                 "Content-type": "application/json"
-//                             }
-//                         }); 
-//                         const data = res.data;
-//                         if (data.message === 'Invalid username or password'){
-//                             // alert('Invalid username or password'); 
-//                             window.alert('Invalid username or password'); 
-//                             console.log("Alerttttt"); 
-//                         }
-//                         console.log(data); 
-                        
-//                         localStorage.setItem("token", data.token);
-//                         setAdmin({ 
-//                             adminEmail: data.email,   
-//                             isLoading: false, 
-//                             adminId: data.adminId  
-//                         })
-//                         router.push("http://localhost:3000/courses"); 
-//                     }}
-
-//                 > Signin</Button>
-
-//             </Card>
-//         </div>
-//     </div>
-// }
-
-// export default Signin;
-
-
-
 import Button from '@mui/material/Button';
 import TextField from "@mui/material/TextField";
 import {Card, Typography, Box} from "@mui/material";
@@ -90,13 +9,13 @@ import axios from "axios";
 import { useRouter } from 'next/navigation'
 import { userState } from '@/store/atoms/user'; 
 import { useSetRecoilState } from 'recoil';
-import { toast } from 'react-toast';
 import { z } from "zod"; 
 import { UserAuth } from '@/app/AuthContext';
+import toast from 'react-hot-toast';
 
 const signinInput = z.object({ 
     email: z.string().max(50).min(5).email(), 
-    password: z.string().min(2)
+    password: z.string().min(6)
 }); 
 
 function Signin() {
@@ -146,34 +65,6 @@ function Signin() {
                                     type="password" placeholder="Password" />
                                 <button
 
-                                    // onClick={async () => {
-
-                                    //     toast.success("Please hold on, while we connect to our backend"); 
-
-                                    //     const res = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/admin/login`, {
-                                    //         email: email,
-                                    //         password: password
-                                    //     }, {
-                                    //         headers: {
-                                    //             "Content-type": "application/json"
-                                    //         }
-                                    //     }); 
-                                    //     const data = res.data;
-                                    //     if (data.message === 'Invalid username or password'){
-                                    //         // alert('Invalid username or password'); 
-                                    //         toast.error('Invalid username or password')
-                                    //         console.log("Alerttttt"); 
-                                    //     }
-                                    //     console.log(data); 
-                                        
-                                    //     localStorage.setItem("token", data.token);
-                                    //     setAdmin({ 
-                                    //         adminEmail: data.email,   
-                                    //         isLoading: false
-                                    //     })
-                                    //     router.push("/adminui/courses"); 
-                                    // }}
-
                                     onClick={
                                         async () => {   
 
@@ -181,8 +72,9 @@ function Signin() {
                                                 const parsedInput = signinInput.safeParse({email, password}); 
                                     
                                                 if(!parsedInput.success) {
-                                                    toast.error('invalid email / password \n password length more the 6 characters!')
+                                                    toast.error('invalid email / password \n password length more the 6 characters!', {duration: 4000})
                                                 } else { 
+                                                    toast.loading("Please hold on, while we connect to our backend", {duration: 7000});
                                                     await handleSignIn(email, password); 
                                                 } 
                                 
