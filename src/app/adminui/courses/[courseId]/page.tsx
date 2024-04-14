@@ -27,7 +27,7 @@ function Course({ params } : {params : any}) {
         setTimeout(() => {
         async function smth() {
             console.log(courseId);  
-            const response = adminEmail?  await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/admin/courses/${courseId}/getone`) : null; 
+            const response = adminEmail ? await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/admin/courses/${courseId}/getone`) : null; 
 
             if(response){ 
                 setCourse({isLoading: false, course: response.data.course});
