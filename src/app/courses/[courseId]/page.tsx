@@ -12,6 +12,7 @@ import { useRouter } from "next/navigation";
 import Image from 'next/image'
 import Appbar from "@/components/client/Appbar";
 import { userEmailState } from "@/store/selectors/userEmail";
+import { checkout } from "../../checkout"
 
 
 interface Course {
@@ -36,7 +37,7 @@ function Course({ params } : {params : any}) {
     useEffect(() => {
       async function smth() {
   
-          const response = userEmail ? await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/user/courses/${courseId}/${userEmail}`) : null;
+          const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/user/courses/${courseId}/${userEmail}`);
   
           if(response?.data.message == "course found") { 
             setUserid(response?.data.userId); 
@@ -54,9 +55,9 @@ function Course({ params } : {params : any}) {
 
     const buyCourse = async () => {
 
-      const response = userEmail ? await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/user/courses/${courseId}/buy`, {
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/user/courses/${courseId}/buy`, {
         email: userEmail
-      }) : null; 
+      }); 
   
       if(response?.data.message == "Bought it") {  
         setBought(true); 
@@ -90,12 +91,22 @@ function Course({ params } : {params : any}) {
             {
               user ? 
               <h3>You purchased this course</h3> : 
-              <form action={buyCourse}>
+              // <form action={buyCourse}>
                 <button
                   className="align-middle select-none font-sans font-bold text-center text-xl mt-5 mb-5 uppercase transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 px-6 rounded-lg bg-indigo-500 text-white shadow-md shadow-gray-900/10 hover:shadow-lg hover:shadow-gray-900/20 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none" 
                   type="submit"
+                  onClick={(() => {
+                    checkout({
+                      lineItems: [
+                        {
+                          price: "price_1P5MJ4SCQeisMc12gESxuckT",
+                          quantity: 1
+                        }
+                      ]
+                    })
+                  })}
                 >Buy</button> 
-              </form>
+              // </form>
             } 
           </div>
           {/* <div style={{ display: "flex", justifyContent: "center" }}>
