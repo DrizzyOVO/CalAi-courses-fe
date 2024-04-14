@@ -8,7 +8,7 @@ import axios from "axios";
 import { courseState, courseInterface } from "@/store/atoms/course";
 import {useRecoilState, useRecoilValue, useSetRecoilState} from "recoil";
 import { courseTitle, coursePrice, isCourseLoading, courseDescription } from "@/store/selectors/course";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import Image from 'next/image'
 import Appbar from "@/components/client/Appbar";
 import { userEmailState } from "@/store/selectors/userEmail";
@@ -36,14 +36,16 @@ function Course({ params } : {params : any}) {
 
     useEffect(() => {
       async function smth() {
-  
+
+          console.log("courseId :- " + courseId);
+
           const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/user/courses/${courseId}/${userEmail}`);
   
           if(response?.data.message == "course found") { 
             setUserid(response?.data.userId); 
             setCourse(response?.data.course); 
             setUser(response?.data.theUser); 
-            console.log(response?.data.course); 
+            console.log("course :- " + response?.data.course); 
             console.log(course);
             console.log("title :- " + course?.title); 
           }
@@ -53,24 +55,69 @@ function Course({ params } : {params : any}) {
   
     }, []);
 
+    const out = async () => {
+
+      let key = ""
+      if (course?.title == "Ui/Ux") { 
+        key = `${process.env.NEXT_PUBLIC_UI_UX}`
+      } else if (course?.title == "LaFerrari") { 
+        key = `${process.env.NEXT_PUBLIC_LAFERRARI}`
+      } else { 
+        key = `${process.env.NEXT_PUBLIC_WEBSITE_DEVELOPMENT}`
+      }
+
+      checkout({
+        lineItems: [
+          {
+            price: key,
+            quantity: 1
+          }
+        ]
+      }) 
+
+    }
+
     const buyCourse = async () => {
 
       const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/user/courses/${courseId}/buy`, {
         email: userEmail
-      }); 
+      }, {
+        headers: {
+            "Content-type": "application/json"
+        }
+    }); 
+
+      // let key = ""
+      // if (course?.title == "Ui/Ux") { 
+      //   key = `${process.env.NEXT_PUBLIC_UI_UX}`
+      // } else if (course?.title == "LaFerrari") { 
+      //   key = `${process.env.NEXT_PUBLIC_LAFERRARI}`
+      // } else { 
+      //   key = `${process.env.NEXT_PUBLIC_WEBSITE_DEVELOPMENT}`
+      // }
+      // // buyCourse();
+      // checkout({
+      //   lineItems: [
+      //     {
+      //       price: key,
+      //       quantity: 1
+      //     }
+      //   ]
+      // }) 
   
       if(response?.data.message == "Bought it") {  
         setBought(true); 
         router.push(`/courses/${courseId}/purchased`); 
       }
+
+      // await out(); 
   
       // router.push(`http://localhost:3000/courses/${courseId}/${userid}`); 
   
     }
 
-
     return (
-
+      
       <>
       {/* <Appbar />  */}
       <div className="z-10">
@@ -95,16 +142,40 @@ function Course({ params } : {params : any}) {
                 <button
                   className="align-middle select-none font-sans font-bold text-center text-xl mt-5 mb-5 uppercase transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 px-6 rounded-lg bg-indigo-500 text-white shadow-md shadow-gray-900/10 hover:shadow-lg hover:shadow-gray-900/20 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none" 
                   type="submit"
-                  onClick={(() => {
+                  onClick={ () => {
+                    let key = ""
+                    if (course?.title == "Ui/Ux") { 
+                      key = `${process.env.NEXT_PUBLIC_UI_UX}`
+                    } else if (course?.title == "LaFerrari") { 
+                      key = `${process.env.NEXT_PUBLIC_LAFERRARI}`
+                    } else { 
+                      key = `${process.env.NEXT_PUBLIC_WEBSITE_DEVELOPMENT}`
+                    }
+                    // buyCourse();
                     checkout({
                       lineItems: [
                         {
-                          price: "price_1P5MJ4SCQeisMc12gESxuckT",
+                          price: key,
                           quantity: 1
                         }
                       ]
-                    })
-                  })}
+                    }) 
+                    buyCourse();
+
+                    // const {paymentIntent, error} = await stripe.confirmCardPayment(clientSecret);
+                    // if (error) {
+                    //     console.log("error byuing");
+                    // } else if (paymentIntent && paymentIntent.status === 'succeeded') {
+                    //     await buyCourse(); 
+                    // }
+
+                  // })}
+
+                  // onClick={async () => {
+                  //   const response = router.push(`https://buy.stripe.com/test_9AQg03byM0r8d2w144`)
+                  //   console.log(response); 
+                  }}
+
                 >Buy</button> 
               // </form>
             } 

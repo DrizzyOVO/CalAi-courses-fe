@@ -1,4 +1,10 @@
 import { loadStripe } from "@stripe/stripe-js";
+import { useRouter } from "next/navigation";
+import buyCourse from "./courses/[courseId]/page"; 
+import Stripe from "stripe";
+import getRawBody from "raw-body";
+
+const stripe = new Stripe(process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY);
 
 export async function checkout({lineItems}){
 	let stripePromise = null
@@ -17,6 +23,20 @@ export async function checkout({lineItems}){
 		lineItems,
 		successUrl: `${window.location.origin}?session_id={CHECKOUT_SESSION_ID}`,
 		cancelUrl: window.location.origin
-	})
+	}).then(result => {
+        if (result.error) {
+            alert(result.error.message);
+        } else if (result.successUrl) { 
+            buyCourse(); 
+        }
+    })
+
+    // const {paymentIntent, error} = await stripe.confirmCardPayment(clientSecret);
+    // if (error) {
+    //     console.log("error byuing");
+    // } else if (paymentIntent && paymentIntent.status === 'succeeded') {
+    //     await buyCourse(); 
+    // }
+
 
 }
